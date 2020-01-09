@@ -66,7 +66,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
        locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
        locationManager.requestWhenInUseAuthorization()
+        
        locationManager.startUpdatingLocation()
+        
+
 ////        let tempLocation = locationManager.location
 ////        let region1 = MKCoordinateRegion(center: tempLocation!.coordinate, span: span)
 ////        mapView.setRegion(region1, animated: true)
@@ -91,10 +94,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
         //grab user location
-        let userLocation : CLLocation = locations[0]
+        let i = mapView.annotations.count
+        let annotationsToRemove = mapView.annotations.filter { $0 !== mapView.userLocation }
+        mapView.removeAnnotations( annotationsToRemove )
         
+        let userLocation : CLLocation = locations[0]
         let lat = userLocation.coordinate.latitude
        let long = userLocation.coordinate.longitude
         //define delta (difference) of lat and long
@@ -114,11 +119,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //        // set the region on the map
        mapView.setRegion(region, animated: true)
         
+        let annotation = MKPointAnnotation()
+        annotation.title = "You are here"
+       annotation.coordinate = userLocation.coordinate
+        mapView.addAnnotation(annotation)
         
-//        let annotation = MKPointAnnotation()
-//        annotation.title = "You are here"
-//        annotation.coordinate = userLocation.coordinate
-//        mapView.addAnnotation(annotation)
+       
+        
         
         //find the user address from his location
         //CLGeocoder().reverseGeocodeLocation()
