@@ -55,9 +55,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //
 //
 //
-//        //adding gesture recognizer
-//        let gestureLongPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
-//        mapView.addGestureRecognizer(gestureLongPress)
+//
 //
 //
 //
@@ -69,6 +67,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
        locationManager.startUpdatingLocation()
         
+        
+        
+//        //addding tap gesture on annotation
+//        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+//        //gestureRecognizer.delegate = self as! UIGestureRecognizerDelegate
+//        mapView.addGestureRecognizer(gestureRecognizer)
+        
+        //adding gesture recognizer
+               let gestureLongPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+               mapView.addGestureRecognizer(gestureLongPress)
+//
 
 ////        let tempLocation = locationManager.location
 ////        let region1 = MKCoordinateRegion(center: tempLocation!.coordinate, span: span)
@@ -83,6 +92,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @objc func longPress(gestureRecognizer : UILongPressGestureRecognizer)
     {
+        //remove annotations
+        let i = mapView.annotations.count
+        if i != 0
+        {
+        let annotationsToRemove = mapView.annotations.filter { $0 !== mapView.userLocation }
+        mapView.removeAnnotations( annotationsToRemove )
+        }
+        
         let touchPoint = gestureRecognizer.location(in: mapView)
         let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
         
@@ -95,9 +112,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         //grab user location
-        let i = mapView.annotations.count
-        let annotationsToRemove = mapView.annotations.filter { $0 !== mapView.userLocation }
-        mapView.removeAnnotations( annotationsToRemove )
+       
         
         let userLocation : CLLocation = locations[0]
         let lat = userLocation.coordinate.latitude
@@ -118,6 +133,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //
 //        // set the region on the map
        mapView.setRegion(region, animated: true)
+        mapView.showsUserLocation = true
         
         let annotation = MKPointAnnotation()
         annotation.title = "You are here"
@@ -129,6 +145,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
         //find the user address from his location
         //CLGeocoder().reverseGeocodeLocation()
+    }
+    
+    
+    
+    
+    @objc func handleTap(gestureReconizer: UILongPressGestureRecognizer) {
+
+        let i = mapView.annotations.count
+               if i != 0
+               {
+               let annotationsToRemove = mapView.annotations.filter { $0 !== mapView.userLocation }
+               mapView.removeAnnotations( annotationsToRemove )
+               }
+        
+        let location = gestureReconizer.location(in: mapView)
+        let coordinate = mapView.convert(location,toCoordinateFrom: mapView)
+
+        // Add annotation:
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        mapView.addAnnotation(annotation)
     }
 
 }
